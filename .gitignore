@@ -1,0 +1,19 @@
+# Ignorar node_modules
+node_modules/
+
+package-lock.json
+
+# Ignorar archivos de entorno
+.env
+
+# Ignorar logs
+*.log
+
+# Ignorar carpetas de construcción
+dist/
+build/
+
+# Ignorar directorios de sistema o IDE
+.DS_Store
+.vscode/
+.idea/
