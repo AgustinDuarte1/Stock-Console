@@ -77,7 +77,7 @@ while (true) {
                 console.log('Categoría agregada correctamente.');
                 await input('\nPresione Enter para continuar...');
                 break;
-            }4
+            }
             
 
             if (opcion_categoria === '3') {
@@ -163,15 +163,320 @@ while (true) {
                 4 - Eliminar producto
                 5 - Volver
                 `)
-                const opcion_categoria = await input(": ")
-            if (opcion_categoria === "5") {
+                const opcion_productos = await input(": ")
+            if (opcion_productos === "5") {
                 break
 
+             }
+            if(opcion_productos === '1') {
+                 const productos = await conexion.query(
+                 `SELECT id, tipo_id, nombre, precio, categoria FROM producto_servicio WHERE categoria="producto"`,
+                 {
+                  type: QueryTypes.SELECT
+                  }
+               );      
+                 console.log('\nProductos disponibles:');
+                productos.forEach(prod => {
+                console.log(`Id: ${prod.id} | Tipo ID: ${prod.tipo_id} | Nombre: ${prod.nombre} | Precio: ${prod.precio} | Categoría: ${prod.categoria} |`);
+                 });
+                 await input('\nPresione Enter para continuar...');
+            }
+            if (opcion_productos === '2') {
+                const tipos = await conexion.query(
+                 `SELECT id, descripcion FROM tipo_p_s`,
+                 { type: QueryTypes.SELECT }
+                );
+                console.log('\nTipos de Producto Disponibles:');
+                tipos.forEach(tipo => {
+                console.log(`ID: ${tipo.id} - Nombre: ${tipo.descripcion}`);
+                });
+                
+               const tipoId = await input('Ingrese el ID del tipo de producto: ');
+               const nombre = await input('Ingrese el nombre del producto: ');
+               const precio = await input('Ingrese el precio: ');
+               
+                await conexion.query(
+                    `INSERT INTO producto_servicio (tipo_id, nombre, precio, categoria) VALUES (?, ?, ?, "producto")`,
+                    {
+                        replacements: [tipoId, nombre, precio],
+                        type: QueryTypes.INSERT
+                    }
+                );
+                console.log('Producto agregado correctamente.');
+                await input('\nPresione Enter para continuar...');
+                break;
+            }
+            if (opcion_productos === '3'){
+                const productos = await conexion.query(
+                 `SELECT id, nombre, precio FROM producto_servicio WHERE categoria="producto"`,
+                 {
+                  type: QueryTypes.SELECT
+                  }
+               );      
+                 console.log('\nProductos disponibles:');
+                productos.forEach(prod => {
+                console.log(`Id: ${prod.id} | Nombre: ${prod.nombre} | Precio: ${prod.precio} |`);
+                 });
+
+                const idEditar = await input('ID del producto a editar: ');
+                console.log('\n¿Qué desea actualizar?');
+                console.log('1. Nombre');
+                console.log('2. Precio');
+                console.log('3. Categoría');
+                const opcionUpdate = await input('Seleccione una opción: ');
+
+                switch (opcionUpdate) {
+                case '1':
+                const nuevoNombre = await input('Ingrese el nuevo nombre: ');
+                await conexion.query(
+                `UPDATE producto_servicio SET nombre = ? WHERE id = ?`,
+                {
+                    replacements: [nuevoNombre, idEditar],
+                    type: QueryTypes.UPDATE
+                }
+                );
+                console.log('Nombre actualizado correctamente.');
+                break;
+
+                 case '2':
+                const nuevoPrecio = await input('Ingrese el nuevo precio: ');
+                await conexion.query(
+                `UPDATE producto_servicio SET precio = ? WHERE id = ?`,
+                {
+                    replacements: [nuevoPrecio, idEditar],
+                    type: QueryTypes.UPDATE
+                }
+                );
+                console.log('Precio actualizado correctamente.');
+                break;
+
+                case '3':
+                
+                await conexion.query(
+                `UPDATE producto_servicio SET categoria = "servicio" WHERE id = ?`,
+                {
+                    replacements: [nuevaCategoria, idEditar],
+                    type: QueryTypes.UPDATE
+                }
+                );
+                console.log('Categoría cambiada a "servicio".');
+                break;
+
+                default:
+                console.log('Opción inválida.');
+                break;
+                }
+
+                
+            }
+            if (opcion_productos === '4'){
+                 const categorias = await conexion.query(
+                 `SELECT id, nombre, precio FROM producto_servicio WHERE categoria="producto"`,
+                 {
+                  type: QueryTypes.SELECT
+                  }
+               );      
+                 console.log('\nProductos disponibles:');
+                const prodID=[]
+                categorias.forEach(prod => {
+                console.log(`ID: ${prod.id} | Nombre: ${prod.nombre} | Precio: ${prod.precio}`)
+                prodID.push(prod.id);
+                 });
+                 const idBorrar = await input('ID del producto a eliminar: ');
+                 if (idBorrar === ''){
+                    console.log("No ha seleccionado nada")
+                    await input('')
+                    continue
+                 }
+                 if (!prodID.includes(Number(idBorrar))){
+                    console.log("Opcion seleccionada no existe")
+                    await input('')
+                    continue
+                 }
+                await conexion.query(
+                    `DELETE FROM producto_servicio WHERE id =${idBorrar}`,
+                    {
+                        replacements: [idBorrar],
+                        type: QueryTypes.DELETE
+                    }
+                );
+                console.log('Producto eliminado.');
+                await input('\nPresione Enter para continuar...');
+                break;
+            }
+        }
     }
 
 
-}
-}
+    if (opcion === '3'){
+        while (true) {
+            console.clear()
+            console.log(`
+                Sección Servicios
+                Seleccion una opción:
+                1 - Ver todos los servicios
+                2 - Ingresar nuevo servicio
+                3 - Actualizar servicio
+                4 - Eliminar servicio
+                5 - Volver
+                `)
+                const opcion_servicios = await input(": ")
+                if (opcion_servicios === '5'){
+                    break
+                }
+
+                if (opcion_servicios === '1') {
+                 const productos = await conexion.query(
+                 `SELECT id, tipo_id, nombre, precio, categoria FROM producto_servicio WHERE categoria="servicio"`,
+                 {
+                  type: QueryTypes.SELECT
+                  }
+               );      
+                 console.log('\nServicios disponibles:');
+                productos.forEach(prod => {
+                console.log(`Id: ${prod.id} | Tipo ID: ${prod.tipo_id} | Nombre: ${prod.nombre} | Precio: ${prod.precio} |`);
+                 });
+                 await input('\nPresione Enter para continuar...');
+                }
+
+                if (opcion_servicios === '2') {
+                const tipos = await conexion.query(
+                 `SELECT id, descripcion FROM tipo_p_s`,
+                 { type: QueryTypes.SELECT }
+                );
+                console.log('\nTipos de Servicio Disponibles:');
+                tipos.forEach(tipo => {
+                console.log(`ID: ${tipo.id} - Nombre: ${tipo.descripcion}`);
+                });
+                
+               const tipoId = await input('Ingrese el ID del tipo de servicio: ');
+               const nombre = await input('Ingrese el nombre del servicio: ');
+               const precio = await input('Ingrese el precio: ');
+               
+                await conexion.query(
+                    `INSERT INTO producto_servicio (tipo_id, nombre, precio, categoria) VALUES (?, ?, ?, "servicio")`,
+                    {
+                        replacements: [tipoId, nombre, precio],
+                        type: QueryTypes.INSERT
+                    }
+                );
+                console.log('Servicio agregado correctamente.');
+                await input('\nPresione Enter para continuar...');
+                break;
+                }
+
+                if (opcion_servicios === '3') {
+                const productos = await conexion.query(
+                 `SELECT id, nombre, precio FROM producto_servicio WHERE categoria="servicio"`,
+                 {
+                  type: QueryTypes.SELECT
+                  }
+                );      
+                 console.log('\nServicios disponibles:');
+                productos.forEach(prod => {
+                console.log(`Id: ${prod.id} | Nombre: ${prod.nombre} | Precio: ${prod.precio} |`);
+                 });
+
+                const idEditar = await input('ID del servicio a editar: ');
+                console.log('\n¿Qué desea actualizar?');
+                console.log('1. Nombre');
+                console.log('2. Precio');
+                console.log('3. Categoría');
+                const opcionUpdate = await input('Seleccione una opción: ');
+
+                switch (opcionUpdate) {
+                case '1':
+                const nuevoNombre = await input('Ingrese el nuevo nombre: ');
+                await conexion.query(
+                `UPDATE producto_servicio SET nombre = ? WHERE id = ?`,
+                {
+                    replacements: [nuevoNombre, idEditar],
+                    type: QueryTypes.UPDATE
+                }
+                );
+                console.log('Nombre actualizado correctamente.');
+                break;
+
+                 case '2':
+                const nuevoPrecio = await input('Ingrese el nuevo precio: ');
+                await conexion.query(
+                `UPDATE producto_servicio SET precio = ? WHERE id = ?`,
+                {
+                    replacements: [nuevoPrecio, idEditar],
+                    type: QueryTypes.UPDATE
+                }
+                );
+                console.log('Precio actualizado correctamente.');
+                break;
+
+                case '3':
+                await conexion.query(
+                `UPDATE producto_servicio SET categoria = "producto" WHERE id = ?`,
+                {
+                    replacements: [nuevaCategoria, idEditar],
+                    type: QueryTypes.UPDATE
+                }
+                );
+                console.log('Categoría cambiada a "producto".');
+                break;
+
+                default:
+                console.log('Opción inválida.');
+                break;
+                }
+
+                
+                }
+
+                if (opcion_servicios === '4') {
+                 const categorias = await conexion.query(
+                 `SELECT id, nombre, precio FROM producto_servicio WHERE categoria="servicio"`,
+                 {
+                  type: QueryTypes.SELECT
+                  }
+                );      
+                 console.log('\nServicios disponibles:');
+                const prodID=[]
+                categorias.forEach(prod => {
+                console.log(`ID: ${prod.id} | Nombre: ${prod.nombre} | Precio: ${prod.precio}`)
+                prodID.push(prod.id);
+                 });
+                 const idBorrar = await input('ID del producto a eliminar: ');
+                 if (idBorrar === ''){
+                    console.log("No ha seleccionado nada")
+                    await input('')
+                    continue
+                 }
+                 if (!prodID.includes(Number(idBorrar))){
+                    console.log("Opcion seleccionada no existe")
+                    await input('')
+                    continue
+                 }
+                await conexion.query(
+                    `DELETE FROM producto_servicio WHERE id =${idBorrar}`,
+                    {
+                        replacements: [idBorrar],
+                        type: QueryTypes.DELETE
+                    }
+                );
+                console.log('Servicio eliminado.');
+                await input('\nPresione Enter para continuar...');
+                break;
+                }
+
+            }
+        }
+    
+        
+
+
+
+
+
+
+    
+
+
 }
 
 
